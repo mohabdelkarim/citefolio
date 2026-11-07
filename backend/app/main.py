@@ -11,6 +11,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api import upload as upload_api
 from app.db.neon import close_pool, init_pool
 from app.utils.config import get_settings
 
@@ -61,6 +62,9 @@ async def unhandled_exception_handler(_request: Request, exc: Exception):
         status_code=500,
         content={"detail": "Internal server error"},
     )
+
+
+app.include_router(upload_api.router)
 
 
 @app.get("/")
