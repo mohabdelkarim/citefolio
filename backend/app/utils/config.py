@@ -35,6 +35,8 @@ class Settings(BaseSettings):
 
     voyage_api_key: str = Field("", alias="VOYAGE_API_KEY")
     voyage_model: str = Field("voyage-4", alias="VOYAGE_MODEL")
+    mistral_api_key: str = Field("", alias="MISTRAL_API_KEY")
+    mistral_embed_model: str = Field("mistral-embed", alias="MISTRAL_EMBED_MODEL")
     cohere_api_key: str = Field("", alias="COHERE_API_KEY")
     cohere_rerank_model: str = Field("rerank-v3.5", alias="COHERE_RERANK_MODEL")
 
