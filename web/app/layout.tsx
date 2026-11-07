@@ -20,9 +20,61 @@ const mono = IBM_Plex_Mono({
   variable: "--font-mono",
 });
 
+const siteUrl = "https://mohabdelkarim.github.io/citefolio";
+const title = "Citefolio";
+const description = "Ask your PDF. Answers cite the page.";
+
 export const metadata: Metadata = {
-  title: "Citefolio",
-  description: "Ask your PDF. Answers cite the page.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: title,
+    template: "%s · Citefolio",
+  },
+  description,
+  applicationName: "Citefolio",
+  keywords: [
+    "RAG",
+    "PDF Q&A",
+    "citations",
+    "pgvector",
+    "Next.js",
+    "FastAPI",
+    "Neon",
+  ],
+  authors: [{ name: "MOHAbdelkarim", url: "https://github.com/mohabdelkarim" }],
+  creator: "MOHAbdelkarim",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
+  openGraph: {
+    type: "website",
+    url: siteUrl,
+    title,
+    description,
+    siteName: "Citefolio",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Citefolio — Ask your PDF. Answers cite the page.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/og.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
