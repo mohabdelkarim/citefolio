@@ -23,8 +23,14 @@ async def init_pool() -> asyncpg.Pool:
         return _pool
 
     settings = get_settings()
+    dsn = (settings.database_url or "").strip()
+    if not dsn:
+        raise RuntimeError("DATABASE_URL is empty")
+    if not (dsn.startswith("postgres://") or dsn.startswith("postgresql://")):
+        raise RuntimeError("DATABASE_URL has invalid scheme")
+
     _pool = await asyncpg.create_pool(
-        dsn=settings.database_url,
+        dsn=dsn,
         min_size=1,
         max_size=5,
         command_timeout=60,
@@ -49,12 +55,19 @@ def get_pool() -> asyncpg.Pool:
     return _pool
 
 
+async def ensure_pool() -> asyncpg.Pool:
+    """Initialize the pool on demand if startup failed or was skipped."""
+    if _pool is None:
+        return await init_pool()
+    return _pool
+
+
 @asynccontextmanager
 async def get_connection(
     session_id: Optional[UUID] = None,
 ) -> AsyncIterator[asyncpg.Connection]:
     """Acquire a connection, optionally binding RLS session context."""
-    pool = get_pool()
+    pool = await ensure_pool()
     async with pool.acquire() as conn:
         if session_id is not None:
             async with conn.transaction():

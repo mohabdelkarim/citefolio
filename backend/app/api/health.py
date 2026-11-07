@@ -7,7 +7,7 @@ import logging
 import httpx
 from fastapi import APIRouter
 
-from app.db.neon import fetchrow, get_pool
+from app.db.neon import ensure_pool, fetchrow
 from app.utils.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api", tags=["health"])
 
 async def _check_db() -> str:
     try:
-        get_pool()
+        await ensure_pool()
         row = await fetchrow("SELECT 1 AS ok")
         return "connected" if row and row["ok"] == 1 else "error"
     except Exception:
@@ -46,8 +46,17 @@ async def health() -> dict:
     groq = await _ping(settings.groq_base_url, settings.groq_api_key)
     cerebras = await _ping(settings.cerebras_base_url, settings.cerebras_api_key)
 
-    embedder = "configured" if settings.voyage_api_key else "missing_key"
-    reranker = "configured" if settings.cohere_api_key else "missing_key"
+    if settings.voyage_api_key:
+        embedder = "configured"
+    elif settings.mistral_api_key:
+        embedder = "configured_mistral"
+    else:
+        embedder = "missing_key"
+    reranker = (
+        "configured"
+        if settings.cohere_api_key
+        else "skipped_no_cohere"
+    )
 
     status = "ok" if db_status == "connected" else "degraded"
     return {

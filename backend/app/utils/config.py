@@ -16,44 +16,37 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",
+        populate_by_name=True,
     )
 
-    database_url: str = Field("", alias="DATABASE_URL")
+    # Env names match field names uppercased by pydantic-settings.
+    database_url: str = ""
 
-    groq_api_key: str = Field("", alias="GROQ_API_KEY")
-    cerebras_api_key: str = Field("", alias="CEREBRAS_API_KEY")
-    groq_model: str = Field("openai/gpt-oss-120b", alias="GROQ_MODEL")
-    cerebras_model: str = Field("gpt-oss-120b", alias="CEREBRAS_MODEL")
-    groq_base_url: str = Field(
-        "https://api.groq.com/openai/v1",
-        alias="GROQ_BASE_URL",
-    )
-    cerebras_base_url: str = Field(
-        "https://api.cerebras.ai/v1",
-        alias="CEREBRAS_BASE_URL",
-    )
+    groq_api_key: str = ""
+    cerebras_api_key: str = ""
+    groq_model: str = "openai/gpt-oss-120b"
+    cerebras_model: str = "gpt-oss-120b"
+    groq_base_url: str = "https://api.groq.com/openai/v1"
+    cerebras_base_url: str = "https://api.cerebras.ai/v1"
 
-    voyage_api_key: str = Field("", alias="VOYAGE_API_KEY")
-    voyage_model: str = Field("voyage-4", alias="VOYAGE_MODEL")
-    mistral_api_key: str = Field("", alias="MISTRAL_API_KEY")
-    mistral_embed_model: str = Field("mistral-embed", alias="MISTRAL_EMBED_MODEL")
-    cohere_api_key: str = Field("", alias="COHERE_API_KEY")
-    cohere_rerank_model: str = Field("rerank-v3.5", alias="COHERE_RERANK_MODEL")
+    voyage_api_key: str = ""
+    voyage_model: str = "voyage-4"
+    mistral_api_key: str = ""
+    mistral_embed_model: str = "mistral-embed"
+    cohere_api_key: str = ""
+    cohere_rerank_model: str = "rerank-v3.5"
 
-    chunk_size: int = Field(512, alias="CHUNK_SIZE")
-    chunk_overlap_ratio: float = Field(0.15, alias="CHUNK_OVERLAP_RATIO")
+    chunk_size: int = 512
+    chunk_overlap_ratio: float = 0.15
 
-    max_file_size_mb: int = Field(4, alias="MAX_FILE_SIZE_MB")
-    session_ttl_hours: int = Field(2, alias="SESSION_TTL_HOURS")
-    confidence_threshold: float = Field(0.25, alias="CONFIDENCE_THRESHOLD")
-    cache_similarity_threshold: float = Field(
-        0.95,
-        alias="CACHE_SIMILARITY_THRESHOLD",
-    )
+    max_file_size_mb: int = 4
+    session_ttl_hours: int = 2
+    confidence_threshold: float = 0.25
+    cache_similarity_threshold: float = 0.95
 
-    cron_secret: str = Field("change_me", alias="CRON_SECRET")
-    cors_origins: str = Field("http://localhost:3000", alias="CORS_ORIGINS")
-    log_level: str = Field("INFO", alias="LOG_LEVEL")
+    cron_secret: str = "change_me"
+    cors_origins: str = "http://localhost:3000"
+    log_level: str = "INFO"
 
     embedding_dimensions: int = 1024
     retrieval_top_k: int = 20
