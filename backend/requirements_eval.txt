@@ -1,0 +1,4 @@
+# Optional evaluation extras (heavy). Install only when running RAGAs locally.
+-r requirements.txt
+ragas>=0.2.6
+datasets>=3.0.0

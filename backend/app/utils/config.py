@@ -18,7 +18,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    database_url: str = Field(..., alias="DATABASE_URL")
+    database_url: str = Field("", alias="DATABASE_URL")
 
     groq_api_key: str = Field("", alias="GROQ_API_KEY")
     cerebras_api_key: str = Field("", alias="CEREBRAS_API_KEY")

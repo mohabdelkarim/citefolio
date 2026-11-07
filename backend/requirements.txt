@@ -14,6 +14,6 @@ rank-bm25>=0.2.2
 pdfplumber>=0.11.4
 pymupdf>=1.24.14
 python-docx>=1.1.2
-ragas>=0.2.6
 pytest>=8.3.0
 pytest-asyncio>=0.24.0
+

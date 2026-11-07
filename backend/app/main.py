@@ -11,7 +11,11 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.api import cleanup as cleanup_api
+from app.api import feedback as feedback_api
+from app.api import health as health_api
 from app.api import query as query_api
+from app.api import session as session_api
 from app.api import upload as upload_api
 from app.db.neon import close_pool, init_pool
 from app.utils.config import get_settings
@@ -67,6 +71,10 @@ async def unhandled_exception_handler(_request: Request, exc: Exception):
 
 app.include_router(upload_api.router)
 app.include_router(query_api.router)
+app.include_router(session_api.router)
+app.include_router(health_api.router)
+app.include_router(feedback_api.router)
+app.include_router(cleanup_api.router)
 
 
 @app.get("/")
