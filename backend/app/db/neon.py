@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from contextlib import asynccontextmanager
 from typing import Any, AsyncIterator, Optional, Sequence
 from uuid import UUID
@@ -23,11 +24,14 @@ async def init_pool() -> asyncpg.Pool:
         return _pool
 
     settings = get_settings()
-    dsn = (settings.database_url or "").strip()
+    # Prefer process env (Vercel) over cached settings; strip BOM/CRLF noise.
+    dsn = (os.environ.get("DATABASE_URL") or settings.database_url or "")
+    dsn = dsn.strip().lstrip("\ufeff").strip().strip('"').strip("'")
     if not dsn:
         raise RuntimeError("DATABASE_URL is empty")
     if not (dsn.startswith("postgres://") or dsn.startswith("postgresql://")):
-        raise RuntimeError("DATABASE_URL has invalid scheme")
+        preview = dsn[:12].encode("unicode_escape").decode("ascii")
+        raise RuntimeError(f"DATABASE_URL has invalid scheme ({preview})")
 
     _pool = await asyncpg.create_pool(
         dsn=dsn,
