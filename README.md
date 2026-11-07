@@ -48,6 +48,40 @@ Longer notes: [`docs/architecture.md`](docs/architecture.md).
 | Rerank | Cohere |
 | LLM | Groq primary, Cerebras fallback |
 
+DB note: Neon Postgres + pgvector today. Same schema and retrieval SQL work on Supabase (also Postgres + `vector`) if you point `DATABASE_URL` there.
+
+## Chunking strategy
+
+Code: [`backend/app/core/chunker.py`](backend/app/core/chunker.py). Defaults in config: **512 tokens**, **15% overlap** (~77 tokens), tokenizer `cl100k_base`.
+
+Recursive split prefers natural breaks in order: paragraph (`\n\n`), line (`\n`), sentence (`. `), word, then character. That keeps chunks readable for BM25 and embeddings instead of cutting mid-sentence when a cheaper fixed window would.
+
+Each chunk stores `filename`, char offsets, and `estimated_page` (char position / ~3000). The UI cites that page estimate under answers. Real PDF page numbers would need a richer parser; this stays honest for text extraction.
+
+## Evaluation
+
+After each answer, RAGAs runs off the request path and writes scores to `query_logs`. Live thumbs go to `query_feedback` via `POST /api/feedback` (Yes = `1`, No = `-1`).
+
+| Metric | What it checks | Where it lands |
+|--------|----------------|----------------|
+| Faithfulness | Is the answer grounded in the retrieved chunks? | `query_logs.faithfulness` |
+| Answer relevancy | Does the answer address the question? | `query_logs.answer_relevancy` |
+| Context precision | Were the retrieved chunks useful for that answer? | `query_logs.context_precision` |
+| Human feedback | Visitor Yes / No on the demo | `query_feedback.rating` |
+
+Helper: [`backend/app/utils/evaluation.py`](backend/app/utils/evaluation.py). No fixed leaderboard numbers in this README until a labeled sample set is checked in.
+
+## Optimizations
+
+Real tradeoffs in this demo, not a wish list:
+
+- **Hybrid + RRF:** BM25 catches exact terms; pgvector catches paraphrase. RRF (`k=60`) merges ranks. The confidence guard uses **cosine similarity**, not RRF score, because fused ranks are tiny (~0.01) and would always fail a 0.25 threshold.
+- **Rerank:** retrieve top 20, Cohere keeps top 5 before generation. Costs an API call; skips if Cohere is unset and falls back to RRF order.
+- **Query transform:** rewrite / HyDE only when the pipeline decides the raw query needs help. Extra embed + LLM cost when used.
+- **Semantic cache:** near-duplicate questions can reuse a prior answer (similarity threshold ~0.95).
+- **No OCR / no local torch:** text PDFs only; Voyage or Mistral embeds. Fits Vercel size and cold-start limits; scanned PDFs fail instead of shipping a heavy model.
+- **LLM failover:** Groq first, Cerebras if Groq is down or rate-limited.
+
 ## Repository layout
 
 - `backend/`: FastAPI API for Vercel Python
@@ -112,23 +146,21 @@ Never commit `.env` / `.env.local`.
 | GET | `/api/health` | dependency status |
 | GET/POST | `/api/cleanup` | cron cleanup (`Authorization: Bearer CRON_SECRET`) |
 
-## Deploy
+## Deploy considerations
 
 1. **API (Vercel):** Root Directory `backend` → https://citefolio-api.vercel.app
 2. **Web (GitHub Pages):** static export from `web/` via [`.github/workflows/pages_deploy.yml`](.github/workflows/pages_deploy.yml) → https://mohabdelkarim.github.io/citefolio/
 
-Set `CORS_ORIGINS` on the API to include `https://mohabdelkarim.github.io` (and local `http://localhost:3000`). Production Pages builds bake `NEXT_PUBLIC_API_URL=https://citefolio-api.vercel.app`.
+Things that bite if you skip them:
 
-Vercel Cron paths: [`backend/vercel.json`](backend/vercel.json).
+- **Body size:** upload capped at **4MB** (Vercel request body). Larger files need a different upload path.
+- **CORS:** set `CORS_ORIGINS` to include `https://mohabdelkarim.github.io` and local `http://localhost:3000`. Pages builds bake `NEXT_PUBLIC_API_URL=https://citefolio-api.vercel.app`.
+- **Ephemeral sessions:** ~2h TTL, no login. Demo storage, not a long-lived knowledge base.
+- **RLS:** document chunks use FORCE RLS keyed by `app.session_id`. Cleanup deletes **sessions** and relies on CASCADE; bare `DELETE FROM documents` under FORCE RLS is a no-op.
+- **Cron:** Vercel Cron hits `/api/cleanup` daily ([`backend/vercel.json`](backend/vercel.json)). `CRON_SECRET` must not stay at `change_me`.
+- **Managed APIs only:** embeddings, rerank, and LLM stay off-box so the Python function stays small enough for Vercel.
 
 Repo social preview (GitHub UI): see [`.github/SOCIAL_PREVIEW.md`](.github/SOCIAL_PREVIEW.md).
-
-## Limits (v1)
-
-- Max upload 4MB (Vercel request body limit)
-- No OCR for scanned PDFs (text-extractable docs only)
-- Managed embeddings / rerank (no local torch models)
-- Ephemeral sessions (~2h); not a production knowledge base
 
 ## Contributing
 
