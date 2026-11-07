@@ -15,7 +15,7 @@ from app.db.neon import fetch
 from app.utils.config import get_settings
 
 logger = logging.getLogger(__name__)
-TOKEN_RE = re.compile(r"[A-Za-zΑ-Ωα-ω0-9_]+")
+TOKEN_RE = re.compile(r"[^\W_]+", re.UNICODE)
 
 
 class HybridRetriever:
