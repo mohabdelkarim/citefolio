@@ -24,6 +24,12 @@ const siteUrl = "https://mohabdelkarim.github.io/citefolio";
 const title = "Citefolio";
 const description = "Ask your PDF. Answers cite the page.";
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {

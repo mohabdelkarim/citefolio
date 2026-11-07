@@ -18,3 +18,11 @@ World: editorial research desk — ink on cool paper, precise tools.
 ## Motion
 
 Upload ready pulse, stream caret blink, source chip enter. Nothing else.
+
+## Chat surface
+
+Operate mode: conversation wells on bone (user ink-tint, assistant paper tint), sticky composer, thin ink scrollbar on `.chat__log`, source chips under assistant turns. Markdown lists/bold/paragraphs only — no purple SaaS chrome.
+
+## Layout
+
+Mobile-first stacked (brand → chat). Two-zone from 1024px. Touch targets ≥44px. Chat pane uses `dvh` + flex so composer stays usable; iOS safe-area insets honored.

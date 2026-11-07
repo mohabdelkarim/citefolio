@@ -147,6 +147,7 @@ export default function HomePage() {
               role: "assistant",
               content: message,
               streaming: false,
+              error: true,
             };
             return next;
           });
@@ -160,6 +161,7 @@ export default function HomePage() {
           role: "assistant",
           content: message,
           streaming: false,
+          error: true,
         };
         return next;
       });
