@@ -59,6 +59,28 @@ CREATE TABLE IF NOT EXISTS semantic_cache (
 CREATE INDEX IF NOT EXISTS semantic_cache_created_at_idx
     ON semantic_cache (created_at);
 
+CREATE INDEX IF NOT EXISTS semantic_cache_session_id_idx
+    ON semantic_cache (session_id);
+
+-- ENABLE without FORCE: app role still filtered; table owner (cron) can prune.
+ALTER TABLE semantic_cache ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS semantic_cache_session_isolation ON semantic_cache;
+CREATE POLICY semantic_cache_session_isolation ON semantic_cache
+    FOR ALL
+    USING (
+        session_id = COALESCE(
+            NULLIF(current_setting('app.session_id', true), ''),
+            '00000000-0000-0000-0000-000000000000'
+        )::uuid
+    )
+    WITH CHECK (
+        session_id = COALESCE(
+            NULLIF(current_setting('app.session_id', true), ''),
+            '00000000-0000-0000-0000-000000000000'
+        )::uuid
+    );
+
 CREATE TABLE IF NOT EXISTS query_logs (
     id BIGSERIAL PRIMARY KEY,
     session_id UUID REFERENCES user_sessions(session_id) ON DELETE SET NULL,

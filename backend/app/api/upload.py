@@ -14,7 +14,8 @@ from app.core.chunker import DocumentChunker
 from app.core.embedder import get_embedder
 from app.core.parser import ALLOWED_EXTENSIONS, DocumentParser
 from app.core.vector_utils import to_pgvector_literal
-from app.db.neon import execute
+from app.db.neon import executemany
+from app.db.sessions import is_active_session
 from app.utils.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -41,6 +42,9 @@ async def upload_document(
         sid = UUID(session_id)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail="Invalid session_id") from exc
+
+    if not await is_active_session(sid):
+        raise HTTPException(status_code=404, detail="Session expired or missing")
 
     file_bytes = await file.read()
     try:
@@ -75,16 +79,17 @@ async def upload_document(
             INSERT INTO documents (session_id, chunk_text, embedding, metadata)
             VALUES ($1, $2, $3::vector, $4::jsonb)
         """
+        rows = [
+            (
+                sid,
+                chunk["text"],
+                to_pgvector_literal(embedding),
+                json.dumps(chunk),
+            )
+            for chunk, embedding in zip(chunks, embeddings)
+        ]
         try:
-            for chunk, embedding in zip(chunks, embeddings):
-                await execute(
-                    insert_sql,
-                    sid,
-                    chunk["text"],
-                    to_pgvector_literal(embedding),
-                    json.dumps(chunk),
-                    session_id=sid,
-                )
+            await executemany(insert_sql, rows, session_id=sid)
         except Exception as exc:
             logger.exception("Failed to store chunks")
             raise HTTPException(
