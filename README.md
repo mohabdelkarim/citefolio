@@ -2,7 +2,7 @@
 
 **Ask your PDF. Answers cite the page.**
 
-Public portfolio RAG demo: upload a document, ask questions, get streamed answers with page citations. Sessions are ephemeral (~2 hours). No login.
+Upload a document, ask questions, get a streamed answer with page citations. Public portfolio RAG demo. Sessions last about two hours. No login.
 
 [![Live demo](https://img.shields.io/badge/demo-GitHub%20Pages-12141A?style=flat-square)](https://mohabdelkarim.github.io/citefolio/)
 [![API](https://img.shields.io/badge/API-Vercel-C45C4A?style=flat-square)](https://citefolio-api.vercel.app/api/health)
@@ -18,7 +18,7 @@ Public portfolio RAG demo: upload a document, ask questions, get streamed answer
 
 ## Why it exists
 
-Most RAG demos hide provenance. Citefolio is built to show the retrieval path: hybrid search, rerank, streamed answer, and citations tied to pages. Useful as a portfolio piece and as a starting point for citation-first document Q&A.
+I wanted a RAG demo where you can see which page the answer came from. Hybrid search and rerank run on the API; the UI streams tokens and lists sources. Good enough as a portfolio piece, and usable as a small starter if you want citation-heavy PDF Q&A.
 
 ## Architecture
 
@@ -32,9 +32,9 @@ flowchart LR
   A --> L[Groq → Cerebras LLM]
 ```
 
-Pipeline: input guard → semantic cache → HyDE / rewrite / decompose → hybrid BM25 + pgvector (RRF) → retrieval guard → Cohere rerank → anti lost-in-middle context → stream answer → output guard → cache / log.
+Rough pipeline: input checks → semantic cache → query rewrite / HyDE when needed → BM25 + pgvector (RRF) → retrieval checks → Cohere rerank → pack context → stream answer → output checks → cache / log.
 
-More detail: [`docs/architecture.md`](docs/architecture.md).
+Longer notes: [`docs/architecture.md`](docs/architecture.md).
 
 ## Stack
 
@@ -50,10 +50,10 @@ More detail: [`docs/architecture.md`](docs/architecture.md).
 
 ## Repository layout
 
-- `backend/` — FastAPI API for Vercel Python
-- `web/` — Next.js App Router UI (Pages static export)
-- `docs/` — architecture notes and demo screenshot
-- `.github/workflows/pages_deploy.yml` — builds and deploys `web/`
+- `backend/`: FastAPI API for Vercel Python
+- `web/`: Next.js App Router UI (Pages static export)
+- `docs/`: architecture notes and demo screenshot
+- `.github/workflows/pages_deploy.yml`: builds and deploys `web/`
 
 ## Quickstart
 
@@ -114,8 +114,8 @@ Never commit `.env` / `.env.local`.
 
 ## Deploy
 
-1. **API (Vercel)** — Root Directory `backend` → https://citefolio-api.vercel.app
-2. **Web (GitHub Pages)** — static export from `web/` via [`.github/workflows/pages_deploy.yml`](.github/workflows/pages_deploy.yml) → https://mohabdelkarim.github.io/citefolio/
+1. **API (Vercel):** Root Directory `backend` → https://citefolio-api.vercel.app
+2. **Web (GitHub Pages):** static export from `web/` via [`.github/workflows/pages_deploy.yml`](.github/workflows/pages_deploy.yml) → https://mohabdelkarim.github.io/citefolio/
 
 Set `CORS_ORIGINS` on the API to include `https://mohabdelkarim.github.io` (and local `http://localhost:3000`). Production Pages builds bake `NEXT_PUBLIC_API_URL=https://citefolio-api.vercel.app`.
 
@@ -126,7 +126,7 @@ Repo social preview (GitHub UI): see [`.github/SOCIAL_PREVIEW.md`](.github/SOCIA
 ## Limits (v1)
 
 - Max upload 4MB (Vercel request body limit)
-- No OCR for scanned PDFs (text extractable docs only)
+- No OCR for scanned PDFs (text-extractable docs only)
 - Managed embeddings / rerank (no local torch models)
 - Ephemeral sessions (~2h); not a production knowledge base
 

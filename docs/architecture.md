@@ -10,12 +10,12 @@
 
 | Layer | Role |
 |-------|------|
-| `app/api/` | HTTP adapters only (validate, status codes, streaming wrappers) |
+| `app/api/` | HTTP only: validate, status codes, streaming wrappers |
 | `app/core/` | RAG pipeline, retrieval, guards, embeddings |
 | `app/db/` | Pool, SQL helpers, session checks, schema |
 | `app/utils/` | Settings and eval helpers |
 
-Query orchestration lives in `app/core/pipeline.py`. Routers must not grow fat business logic.
+Query flow lives in `app/core/pipeline.py`. Keep business logic out of the routers.
 
 ## Cleanup
 
@@ -23,6 +23,6 @@ Vercel Cron hits `/api/cleanup?mode=all` daily. Cleanup deletes **sessions** (FK
 
 ## Frontend
 
-- `web/components/` UI surfaces
+- `web/components/` UI
 - `web/lib/` API client + session storage
-- `NEXT_PUBLIC_API_URL` points at the FastAPI origin
+- `NEXT_PUBLIC_API_URL` is the FastAPI origin

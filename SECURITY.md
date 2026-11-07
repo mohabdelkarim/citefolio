@@ -9,10 +9,10 @@ Only the `master` branch of this public demo is maintained.
 Email **mohaabdelkarim2@gmail.com** with:
 
 - Affected URL or path (`web/`, `backend/`, API route)
-- Impact summary
-- Steps to reproduce (private; no public PoC issues)
+- What can go wrong
+- How to reproduce (keep it private; no public PoC issues)
 
-You should get an acknowledgement within a few days. Please wait for a fix or disclosure plan before posting details publicly.
+I try to reply within a few days. Please wait for a fix or a disclosure plan before posting details.
 
 ## Please do not
 
@@ -22,4 +22,4 @@ You should get an acknowledgement within a few days. Please wait for a fix or di
 
 ## Demo notes
 
-Citefolio sessions are ephemeral (~2 hours). Uploaded text is stored only for that session and cleaned by cron. Treat the demo as public and untrusted input.
+Sessions last about two hours. Uploaded text stays only for that session and cron cleans it up. Treat the demo as public and the input as untrusted.
