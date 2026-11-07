@@ -118,7 +118,8 @@ class HybridRetriever:
         for doc_id, rrf_score in ordered:
             item = dict(payload[doc_id])
             item["rrf_score"] = rrf_score
-            item["score"] = rrf_score
+            # Keep original similarity for guardrails; expose RRF separately.
+            item["score"] = float(item.get("similarity", rrf_score))
             fused.append(item)
         return fused
 

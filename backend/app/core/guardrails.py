@@ -48,13 +48,15 @@ class RetrievalGuardrail:
     def check(self, chunks: list[dict[str, Any]]) -> tuple[bool, float]:
         if not chunks:
             return False, 0.0
-        scores = [
-            float(c.get("score", c.get("rrf_score", c.get("similarity", 0.0))))
-            for c in chunks
-        ]
-        max_score = max(scores) if scores else 0.0
+        # Prefer semantic cosine similarity; RRF ranks are much smaller (~0.01).
+        similarities = [float(c.get("similarity", 0.0)) for c in chunks]
+        max_score = max(similarities) if similarities else 0.0
         threshold = get_settings().confidence_threshold
-        return max_score >= threshold, max_score
+        if max_score > 0:
+            return max_score >= threshold, max_score
+        rrf_scores = [float(c.get("rrf_score", c.get("score", 0.0))) for c in chunks]
+        max_rrf = max(rrf_scores) if rrf_scores else 0.0
+        return max_rrf > 0, max_rrf
 
 
 class OutputGuardrail:
