@@ -5,7 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import List
 
-from pydantic import Field, field_validator
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -45,7 +45,10 @@ class Settings(BaseSettings):
     cache_similarity_threshold: float = 0.95
 
     cron_secret: str = "change_me"
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = (
+        "http://localhost:3000,"
+        "https://mohabdelkarim.github.io"
+    )
     log_level: str = "INFO"
 
     embedding_dimensions: int = 1024

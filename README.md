@@ -76,14 +76,12 @@ Required for a working demo:
 | GET | `/api/health` | dependency status |
 | GET/POST | `/api/cleanup` | cron cleanup (`Authorization: Bearer CRON_SECRET`) |
 
-## Deploy (Vercel)
+## Deploy
 
-Two projects from the same GitHub repo:
+1. **API (Vercel)** — Root Directory `backend` → https://citefolio-api.vercel.app
+2. **Web (GitHub Pages)** — static export from `web/` via `.github/workflows/pages_deploy.yml` → https://mohabdelkarim.github.io/citefolio/
 
-1. **API** — Root Directory `backend`
-2. **Web** — Root Directory `web`
-
-Set env vars on each project. Point `NEXT_PUBLIC_API_URL` at the API deployment URL and `CORS_ORIGINS` at the web URL.
+Set `CORS_ORIGINS` on the API to include `https://mohabdelkarim.github.io` (and local `http://localhost:3000`). Production Pages builds bake `NEXT_PUBLIC_API_URL=https://citefolio-api.vercel.app`.
 
 Vercel Cron paths are declared in [`backend/vercel.json`](backend/vercel.json).
 

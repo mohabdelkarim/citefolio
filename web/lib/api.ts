@@ -13,10 +13,8 @@ export type UploadResult = {
 };
 
 function apiBase(): string {
-  const base = process.env.NEXT_PUBLIC_API_URL;
-  if (!base) {
-    throw new Error("NEXT_PUBLIC_API_URL is not set");
-  }
+  const base =
+    process.env.NEXT_PUBLIC_API_URL || "https://citefolio-api.vercel.app";
   return base.replace(/\/$/, "");
 }
 

@@ -23,6 +23,8 @@ def test_valid_query_passes() -> None:
 
 
 def test_retrieval_guard_rejects_low_scores() -> None:
-    ok, score = RetrievalGuardrail().check([{"score": 0.01}, {"score": 0.02}])
+    ok, score = RetrievalGuardrail().check(
+        [{"similarity": 0.01}, {"similarity": 0.02}]
+    )
     assert ok is False
     assert score == 0.02
