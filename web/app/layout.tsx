@@ -21,6 +21,8 @@ const mono = IBM_Plex_Mono({
 });
 
 const siteUrl = "https://mohabdelkarim.github.io/citefolio";
+// Match next.config basePath: icon hrefs stay path-absolute and ignore metadataBase.
+const iconBase = process.env.GITHUB_PAGES === "true" ? "/citefolio" : "";
 const title = "Citefolio";
 const description = "Ask your PDF. Answers cite the page.";
 
@@ -51,10 +53,10 @@ export const metadata: Metadata = {
   creator: "MOHAbdelkarim",
   icons: {
     icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" },
+      { url: `${iconBase}/favicon.ico`, sizes: "any" },
+      { url: `${iconBase}/icon.svg`, type: "image/svg+xml" },
     ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+    apple: [{ url: `${iconBase}/apple-touch-icon.png`, sizes: "180x180" }],
   },
   openGraph: {
     type: "website",
